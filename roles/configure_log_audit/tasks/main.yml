@@ -1,0 +1,8 @@
+---
+  - name: Configure audit logserver
+    ansible.builtin.lineinfile:
+      path: /etc/audit/auditd.conf
+      regexp: '^##tcp_listen_port'
+      line: tcp_listen_port = 60
+  - name: Restart auditd
+    command: service auditd restart
