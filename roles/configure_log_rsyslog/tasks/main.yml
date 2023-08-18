@@ -1,0 +1,29 @@
+---
+  - name: change rsyslog config
+    ansible.builtin.lineinfile:
+      path: /etc/rsyslog.conf
+      regexp: '^\#\$ModLoad imudp'
+      line: $ModLoad imudp
+  - ansible.builtin.lineinfile:
+      path: /etc/rsyslog.conf     
+      regexp: '^\#\$UDPServerRun 514'
+      line: $UDPServerRun 514
+  - ansible.builtin.lineinfile:
+      path: /etc/rsyslog.conf     
+      regexp: '^\#\$ModLoad imtcp'
+      line: $ModLoad imtcp       
+  - ansible.builtin.lineinfile:
+      path: /etc/rsyslog.conf
+      regexp: '^\#\$InputTCPServerRun 514'
+      line: $InputTCPServerRun 514
+  - ansible.builtin.blockinfile:
+      path: /etc/rsyslog.conf
+      insertafter: EOF
+      block: |
+        $template RemoteLogs,"/var/log/rsyslog/%HOSTNAME%/%PROGRAMNAME%.log"
+        *.* ?RemoteLogs
+        & ~
+  - name: Restart rsyslog
+    ansible.builtin.service:
+      name: rsyslog
+      state: restarted
