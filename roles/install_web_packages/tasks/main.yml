@@ -1,0 +1,12 @@
+---
+- name: Install a list of packages
+  ansible.builtin.yum:
+    name: "{{ packages }}"
+  vars:
+    packages:
+    - nginx
+    - audispd-plugins
+- name: Start nginx server
+  ansible.builtin.service:
+    name: nginx
+    state: started
