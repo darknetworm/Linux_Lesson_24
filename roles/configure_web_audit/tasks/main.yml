@@ -1,0 +1,25 @@
+---
+  - name: Add audit rules 
+    ansible.builtin.blockinfile:
+      path: /etc/audit/rules.d/audit.rules
+      insertafter: EOF
+      block: |
+        -w /etc/nginx/nginx.conf -p wa -k nginx_conf
+        -w /etc/nginx/default.d/ -p wa -k nginx_conf
+  - name: Change audit config
+    ansible.builtin.lineinfile:
+      path: /etc/audit/auditd.conf
+      regexp: '^name_format'
+      line: name_format = HOSTNAME
+  - name: Enable remote audit
+    ansible.builtin.lineinfile:
+      path: /etc/audisp/plugins.d/au-remote.conf
+      regexp: '^active'
+      line: active = yes
+  - name: Configure remote server
+    ansible.builtin.lineinfile:
+      path: /etc/audisp/audisp-remote.conf
+      regexp: '^remote_server'
+      line: remote_server = 192.168.56.15
+  - name: Restart auditd
+    command: service auditd restart   
