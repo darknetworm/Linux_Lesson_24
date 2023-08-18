@@ -1,0 +1,15 @@
+---
+  - name: Add remote error log
+    ansible.builtin.blockinfile:
+      path: /etc/nginx/nginx.conf
+      insertafter: "error_log /var/log/nginx/error.log"
+      block: |
+        error_log syslog:server=192.168.56.15:514,tag=nginx_error;
+  - ansible.builtin.lineinfile:
+      path: /etc/nginx/nginx.conf     
+      regexp: '^    access_log  /var/log/nginx/access.log  main;'
+      line:     access_log syslog:server=192.168.56.15:514,tag=nginx_access,severity=info combined;
+  - name: Restart nginx
+    ansible.builtin.service:
+      name: nginx
+      state: restarted
